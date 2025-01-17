@@ -11,8 +11,8 @@ class SoftwareView extends Component {
         this.state={
             before_swtcode: props.params.swtcode,
             navigate: props.navigate,
-        };
-        //this.navigate = props.navigate; // useNavigate를 props로 받아오기
+            selectedFile: null,
+        }
     }
 
     componentDidMount () {
@@ -36,6 +36,21 @@ class SoftwareView extends Component {
                 $('#is_Giturl').val(data.swt_github_url)
                 $('#is_Comments').val(data.swt_comments)
                 $('#is_Swt_function').val(data.swt_function)
+                ///
+                var manualName = data.swt_manual_path.replace('/swmanual/','')
+                var fileName = data.swt_big_imgpath.replace('/image/','')
+                var fileName2 = data.swt_imagepath.replace('/image/','')
+                $('#upload_img').prepend('<img id="uploadimg" src="'+data.swt_big_imgpath+'"/>')
+                $('#upload_img2').prepend('<img id="uploadimg2" src="'+data.swt_imagepath+'"/>')
+                $('#imagefile').val(fileName)
+                $('#imagefile2').val(fileName2)
+                $('#manualfile').val(manualName)
+                if($('#uploadimg').attr('src').indexOf("null") > -1){
+                    $('#uploadimg').hide()
+                }
+                if($('#uploadimg2').attr('src').indexOf("null") > -1){
+                    $('#uploadimg2').hide()
+                }
             } catch (error) {
                 alert('작업중 오류가 발생하였습니다1.')
             }
@@ -132,65 +147,139 @@ class SoftwareView extends Component {
             timer: 1000
         })
     }
+    ///이미지경로
+    handleFileInput(type, e){
+        if(type =='file'){
+            $('#imagefile').val(e.target.files[0].name)
+        }else if(type =='file2'){
+            $('#imagefile2').val(e.target.files[0].name)
+        }else if(type =='manual'){
+            $('#manualfile').val(e.target.files[0].name)
+        }
+        this.setState({
+          selectedFile : e.target.files[0],
+        })
+        setTimeout(function() {
+            if(type =='manual'){
+                this.handlePostMenual()
+            }else{
+                this.handlePostImage(type)
+            }
+        }.bind(this),1
+        );
+    }
+
+    handlePostMenual(){
+        const formData = new FormData();
+        formData.append('file', this.state.selectedFile);
+        return axios.post("/api/upload?type=uploads/swmanual/", formData).then(res => {
+            const uploadedMenualPath = `/swmanual/${res.data.filename}`;
+            this.setState({menualName : res.data.filename})
+            $('#is_MenualName').remove()
+            /*$('#upload_menual').prepend('<input id="is_MenualName" type="hidden"'
+            +'name="is_MenualName" value="/swmanual/'+this.state.menualName+'"}/>')*/
+            document.getElementById('manualfile').value = res.data.filename;
+            document.getElementById('upload_menual').innerHTML = `
+            <input id="is_MenualName" type="hidden" name="is_MenualName" value="${uploadedMenualPath}" />`;
+        }).catch(error => {
+            alert('작업중 오류가 발생하였습니다.', error, 'error', '닫기')
+        })
+    }    
+
+    handlePostImage(type){
+        const formData = new FormData();
+        formData.append('file', this.state.selectedFile);
+        return axios.post("/api/upload?type=uploads/image/", formData).then(res => {
+            const uploadedImagePath = `/image/${res.data.filename}`;
+            if(type =='file'){
+                this.setState({fileName : res.data.filename})
+                $('#is_MainImg').remove()
+                $('#uploadimg').remove()
+                /*$('#upload_img').prepend('<img id="uploadimg" src="/image/'
+                +this.state.fileName+'"/>')
+                $('#upload_img').prepend('<input id="is_MainImg" type="hidden"'
+                +'name="is_MainImg" value="/image/'+this.state.fileName+'"}/>')*/
+                document.getElementById('imagefile').value = res.data.filename;
+                document.getElementById('upload_img').innerHTML = `
+                <img id="uploadimg" src="${uploadedImagePath}" alt="Uploaded Image" />
+                <input id="is_MainImg" type="hidden" name="is_MainImg" value="${uploadedImagePath}" />`;
+            }else if(type =='file2'){
+                this.setState({fileName2 : res.data.filename})
+                $('#is_LabelImg').remove()
+                $('#uploadimg2').remove()
+                /*$('#upload_img2').prepend('<img id="uploadimg2" src="/image/'
+                +this.state.fileName2+'"/>')
+                $('#upload_img2').prepend('<input id="is_LabelImg" type="hidden"'
+                +'name="is_LabelImg" value="/image/'+this.state.fileName2+'"}/>')*/
+                document.getElementById('imagefile2').value = res.data.filename;
+                document.getElementById('upload_img2').innerHTML = `
+                <img id="uploadimg2" src="${uploadedImagePath}" alt="Uploaded Image" />
+                <input id="is_LabelImg" type="hidden" name="is_LabelImg" value="${uploadedImagePath}" />
+          `;
+            }
+        }).catch(error => {
+            alert('작업중 오류가 발생하였습니다.')            
+        })
+    }
 
     render () {
         return (
-            <section class="sub_wrap">
-                <article class="s_cnt mp_pro_li ct1">
-                    <div class="li_top">
-                        <h2 class="s_tit1">Software Tools 등록/수정</h2>
+            <section className="sub_wrap">
+                <article className="s_cnt mp_pro_li ct1">
+                    <div className="li_top">
+                        <h2 className="s_tit1">Software Tools 등록/수정</h2>
                     </div>
-                    <div class="bo_w re1_wrap re1_wrap_writer">
+                    <div className="bo_w re1_wrap re1_wrap_writer">
                         <form name="frm" id="frm" action="" onsubmit="" method="post" >
                             <input id="is_Swtcode" type="hidden" name="is_Swtcode" />
                             <input id="is_Email" type="hidden" name="is_Email" value="guest" />
                             <input id="is_beforeSwtcode" type="hidden" name="is_beforeSwtcode" value={this.state.before_swtcode} />
-                            <article class="res_w">
-                                <p class="ment" style={{"text-align": "right"}}>
-                                    <span class="red">(*)</span>표시는 필수입력사항 입니다.
+                            <article className="res_w">
+                                <p className="ment" style={{"text-align": "right"}}>
+                                    <span className="red">(*)</span>표시는 필수입력사항 입니다.
                                 </p>
-                                <div class="tb_outline">
-                                    <table class="table_ty1">
+                                <div className="tb_outline">
+                                    <table className="table_ty1">
                                         <tr>
                                             <th>
-                                                <label for="is_Swt_toolname">툴 이름<span class="red">(*)</span></label>
+                                                <label for="is_Swt_toolname">툴 이름<span className="red">(*)</span></label>
                                             </th>
                                             <td>
-                                                <input type="text" name="is_Swt_toolname" id="is_Swt_toolname" class="" />
+                                                <input type="text" name="is_Swt_toolname" id="is_Swt_toolname" className="" />
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>
-                                                <label for="is_Swt_demo_site">데모 URL<span class="red">(*)</span></label>
+                                                <label for="is_Swt_demo_site">데모 URL<span className="red">(*)</span></label>
                                             </th>
                                             <td>
-                                                <input type="text" name="is_Swt_demo_site" id="is_Swt_demo_site" class="" />
+                                                <input type="text" name="is_Swt_demo_site" id="is_Swt_demo_site" className="" />
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>
-                                                <label for="is_Giturl">Github URL<span class="red">(*)</span></label>
+                                                <label for="is_Giturl">Github URL<span className="red">(*)</span></label>
                                             </th>
                                             <td>
-                                                <input type="text" name="is_Giturl" id="is_Giturl" class="" />
+                                                <input type="text" name="is_Giturl" id="is_Giturl" className="" />
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>
-                                                <label for="is_Comments">설명<span class="red">(*)</span></label>
+                                                <label for="is_Comments">설명<span className="red">(*)</span></label>
                                             </th>
                                             <td>
                                                 <textarea name="is_Comments" id="is_Comments" rows="" cols=""></textarea>
                                             </td>
                                         </tr>
-                                        <tr class="div_tb_tr fileb">
+                                        <tr className="div_tb_tr fileb">
                                             <th>
                                                 메뉴얼 파일 #1
                                             </th>
-                                            <td class="fileBox fileBox_w1">
-                                                <label for="uploadBtn1" class="btn_file">파일선택</label>
-                                                <input type="text" id="manualfile" class="fileName fileName1" readonly="readonly" placeholder="선택된 파일 없음"/>
-                                                <input type="file" id="uploadBtn1" class="uploadBtn uploadBtn1" onChange={e => this.handleFileInput('manual',e)}/>	
+                                            <td className="fileBox fileBox_w1">
+                                                <label for="uploadBtn1" className="btn_file">파일선택</label>
+                                                <input type="text" id="manualfile" className="fileName fileName1" readonly="readonly" placeholder="선택된 파일 없음"/>
+                                                <input type="file" id="uploadBtn1" className="uploadBtn uploadBtn1" onChange={e => this.handleFileInput('manual',e)}/>	
                                                 <div id="upload_menual">
                                                 </div>
                                             </td>
@@ -221,14 +310,14 @@ class SoftwareView extends Component {
                                         </tr>
                                         <tr>
                                             <th>
-                                                <label for="is_Swt_function">상세 기능<span class="red">(*)</span></label>
+                                                <label for="is_Swt_function">상세 기능<span className="red">(*)</span></label>
                                             </th>
                                             <td>
                                                 <textarea name="is_Swt_function" id="is_Swt_function" rows="" cols=""></textarea>
                                             </td>
                                         </tr>
                                     </table>
-                                    <div class="btn_confirm mt20" style={{"margin-bottom": "44px"}}>
+                                    <div className="btn_confirm mt20" style={{"margin-bottom": "44px"}}>
                                         <Link to={'/SoftwareList'} className="bt_ty bt_ty1 cancel_ty1">취소</Link>
                                         <a href="#" className="bt_ty bt_ty2 submit_ty1 saveclass" onClick={(e) => {
                                             e.preventDefault();

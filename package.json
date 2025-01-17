@@ -18,7 +18,8 @@
     "recharts": "^2.15.0",
     "redux": "^5.0.1",
     "shallow-equal": "^3.1.0",
-    "sweetalert2": "^11.15.10"
+    "sweetalert2": "^11.15.10",
+    "web-vitals": "^4.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -44,5 +45,11 @@
       "last 1 safari version"
     ]
   },
-  "proxy":"http://127.0.0.1:5000"
+  "proxy": "http://127.0.0.1:5000",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.26.0",
+    "babel-loader": "^9.2.1"
+  }
 }

@@ -42,17 +42,21 @@ class SoftwareList extends Component {
             var reg_date = year +'.'+month+'.'+day
 
             result.push(
-                <tr class="hidden_type">
-                    <td>{data.swt_toolname}</td>
-                    <td>{data.swt_function}</td>
-                    <td>{reg_date}</td>
-                    <td>
-                        <Link to={'/SoftwareView/'+data.swt_code} 
-                        className="bt_c1 bt_c2 w50_b">수정</Link>
-                        <a href="#n" class="bt_c1 w50_b" id={data.swt_code}
-                        onClick={(e) => this.deleteSwtool(e)}>삭제</a>
-                    </td>
-                </tr>
+                //고침 tbody 추가 (게시판에 선 사라짐)
+                <tbody>
+                    <tr className="hidden_type">
+                        <td>{data.swt_toolname}</td>
+                        <td>{data.swt_function}</td>
+                        <td>{reg_date}</td>
+                        <td>
+                            <Link to={'/SoftwareView/'+data.swt_code} 
+                            className="bt_c1 bt_c2 w50_b">수정</Link>
+                            <a href="#n" className="bt_c1 w50_b" id={data.swt_code}
+                            onClick={(e) => this.deleteSwtool(e)}>삭제</a>
+                        </td>
+                    </tr>
+                </tbody>
+                
             )
         }
         return result
@@ -95,25 +99,28 @@ class SoftwareList extends Component {
 
     render () {
         return (
-            <section class="sub_wrap" >
-                <article class="s_cnt mp_pro_li ct1 mp_pro_li_admin">
-                    <div class="li_top">
-                        <h2 class="s_tit1">Software Tools 목록</h2>
-                        <div class="li_top_sch af">
+            <section className="sub_wrap" >
+                <article className="s_cnt mp_pro_li ct1 mp_pro_li_admin">
+                    <div className="li_top">
+                        <h2 className="s_tit1">Software Tools 목록</h2>
+                        <div className="li_top_sch af">
                         <Link to={'/SoftwareView/register'} className="sch_bt2 wi_au">Tool 등록</Link>
                         </div>
                     </div>
 
-                    <div class="list_cont list_cont_admin">
-                        <table class="table_ty1 ad_tlist">
-                            <tr>
-                                <th>툴 이름</th>
-                                <th>기능</th>
-                                <th>등록일</th>
-                                <th>기능</th>
-                            </tr>
+                    <div className="list_cont list_cont_admin">
+                        <table className="table_ty1 ad_tlist">
+                            <tbody>
+                                <tr>
+                                    <th>툴 이름</th>
+                                    <th>기능</th>
+                                    <th>등록일</th>
+                                    <th>기능</th>
+                                </tr>
+                            </tbody>
+                            
                         </table>	
-                        <table class="table_ty2 ad_tlist">
+                        <table className="table_ty2 ad_tlist">
                             {this.state.append_SwtoolList}
                         </table>
                     </div>
