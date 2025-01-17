@@ -5,9 +5,9 @@ class LoginForm extends Component {
     render () {
         return (
             <section className="main">
-                <div className="m_login">
-                <h3><span><img src={require("../img/main/log_img.png")} alt="" /></span>LOGIN</h3>
-                <div className="log_box">
+                <div className="m_login signin">
+                    <h3><span><img src={require("../img/main/log_img.png")} alt="" /></span>LOGIN</h3>
+                    <div className="log_box">
                     <form onSubmit={this.handleSubmit}>
                     <div className="in_ty1">
                         <span><img src={require("../img/main/m_log_i3.png")} alt="" /></span>
